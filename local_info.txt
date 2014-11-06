@@ -136,4 +136,13 @@
     10.1.12.8        0x1         0x0         00:50:56:a4:62:83     *        eth0
     10.1.0.9         0x1         0x2         00:25:84:57:e4:7e     *        eth0
 
+# listen to broadcasts
+
+  # arp
+  # netbios
+  # zeroconf/bonjour etc..
+  # cdp ? igmp ?
+  # what else ?.....
+
+
 
