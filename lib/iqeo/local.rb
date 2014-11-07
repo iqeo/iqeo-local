@@ -25,7 +25,15 @@ module Local
 
     def interfaces
       @interfaces ||= Socket.getifaddrs.select do |intf|
-        intf.addr.ipv4? && ! intf.addr.ipv4_loopback?
+        if intf.addr.ipv4? && ! intf.addr.ipv4_loopback?
+          begin
+            # jruby-head returns bogus addrinfo objects sometimes, test it really has an ip address
+            intf.addr.ip_address
+            true
+          rescue SocketError
+            false
+          end
+        end
       end
     end
    
