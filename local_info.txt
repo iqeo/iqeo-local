@@ -43,15 +43,16 @@
 
 # network interface list
 
-  nmcli dev
+  nmcli device show
 
     DEVICE     TYPE              STATE        
     eth0       802-3-ethernet    connected    
     wlan0      802-11-wireless   disconnected 
 
 # network interface info
+# This shows less information these days...
 
-  nmcli dev list iface eth0
+  nmcli device show eth0
 
     GENERAL.DEVICE:                         eth0
     GENERAL.TYPE:                           802-3-ethernet
@@ -135,6 +136,27 @@
     10.1.1.21        0x1         0x2         00:11:5d:5a:94:00     *        eth0
     10.1.12.8        0x1         0x0         00:50:56:a4:62:83     *        eth0
     10.1.0.9         0x1         0x2         00:25:84:57:e4:7e     *        eth0
+
+# network connections list
+
+nmcli connection show --active
+NAME             UUID                                  TYPE      DEVICE          
+DHCP Dell Dock   0e647820-ff4e-386d-8446-e83d02542908  ethernet  enx0c379613cd99 
+br-04fa738994e6  aa35210c-ce72-4149-9f3d-eeb6dc84c181  bridge    br-04fa738994e6 
+br-64f4b1d6bbc9  db6a54b7-b7f5-4bc9-b6d4-85ae1e77ca25  bridge    br-64f4b1d6bbc9 
+br-df3089a32ca1  5abab1f0-db80-438a-8dc6-857299d4ebdb  bridge    br-df3089a32ca1 
+br-f1de9826bf67  8feb0e18-139d-484c-8c51-67d6b4a50543  bridge    br-f1de9826bf67 
+docker0          8359618c-ad41-4fa5-8ee5-1e646f54a303  bridge    docker
+
+
+# network connections details
+
+nmcli connection show --active 'DHCP Dell Dock'
+
+...lots of details
+
+...and see export option ?
+
 
 # listen to broadcasts
 

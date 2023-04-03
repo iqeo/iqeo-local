@@ -5,20 +5,20 @@ require 'json'
 module Iqeo
 module Local
 
-  class NetInfo
+  class Network
 
-    attr_reader :hostname, :interfaces, :addresses, :routes, :arp, :nmcli, :dns, :dhcp
+    attr_reader :name, :interfaces, :addresses, :routes, :arp, :nmcli, :dns, :dhcp
 
     def initialize
       collect
     end
 
     def collect
-      hostname ; interfaces ; addresses ; routes ; arp ; nmcli ; dns ; dhcp
+      name ; interfaces ; addresses ; routes ; arp ; nmcli ; dns ; dhcp
     end
 
     def all
-      { hostname: @hostname, interfaces: @interfaces, addresses: @addresses, routes: @routes, arp: @arp, dns: @dns, dhcp: @dhcp }
+      { name: @name, interfaces: @interfaces, addresses: @addresses, routes: @routes, arp: @arp, dns: @dns, dhcp: @dhcp }
     end
 
     def to_json
@@ -29,13 +29,13 @@ module Local
       all.to_json( indent: '  ', space: ' ', array_nl: "\n", object_nl: "\n" )
     end
 
-    def hostname
-      @hostname ||= Socket.gethostname
+    def name
+      @name ||= Socket.gethostname
     end
 
     def interfaces
       # todo: also get interface info...  hardware type ?  speed/duplex ?  statistics ?
-      # ...Socket.constants.grep(/IFF_/).select { |iff| i.flags & Socket.const_get(iff) != 0 } 
+      # ...Socket.constants.grep(/IFF_/).select { |iff| i.flags & Socket.const_get(iff) != 0 }
       if defined? JRuby
         # jruby (only interfaces with IP addresses)...
         # nis = java.net.NetworkInterface.getNetworkInterfaces.collect { |ni| { :name => ni.name, :hwaddr => ni.hardware_address } }
@@ -47,7 +47,7 @@ module Local
             mac:   case # jruby Addrinfo#to_sockaddr is not implemented
                    when match = ifa.inspect.match(/HWADDR=(?<mac>\h\h:\h\h:\h\h:\h\h:\h\h:\h\h)/) then match[:mac]
                    when ifa.name == 'lo' then '00:00:00:00:00:00'
-                   end,  
+                   end,
             up:    nil,
             flags: nil
           }
@@ -78,7 +78,7 @@ module Local
               address:   ifa.addr.ip_address,
               netmask:   ifa.netmask   ? ifa.netmask.ip_address   : nil,  # point-to-point - no netmask
               broadcast: ifa.broadaddr ? ifa.broadaddr.ip_address : nil,  # ipv6 - no broadcast
-              type:      ifa.addr.ipv4? ? :ipv4 : :ipv6 
+              type:      ifa.addr.ipv4? ? :ipv4 : :ipv6
             }
           rescue SocketError
             nil
@@ -93,7 +93,7 @@ module Local
               address:   ifa.addr.ip_address,
               netmask:   ifa.netmask   ? ifa.netmask.ip_address   : nil,  # point-to-point - no netmask
               broadcast: ifa.broadaddr ? ifa.broadaddr.ip_address : nil,  # ipv6 - no broadcast
-              type:      ifa.addr.ipv4? ? :ipv4 : :ipv6 
+              type:      ifa.addr.ipv4? ? :ipv4 : :ipv6
             }
           end
         end.compact
@@ -122,7 +122,7 @@ module Local
         {
           interface: values[5],
           type:      :ipv4,
-          address:   values[0], 
+          address:   values[0],
           hwaddr:    values[3]
         }
       end.compact
@@ -131,10 +131,10 @@ module Local
     def nmcli
       @nmcli ||= interfaces.collect do |intf|
         unless intf[:name] == 'lo'
-          cmd = "nmcli dev list iface #{intf[:name]}"
+          cmd = "nmcli device show #{intf[:name]}"
           {
             interface: intf[:name],
-            data:      `#{cmd}`.lines.collect(&:chomp) 
+            data:      `#{cmd}`.lines.collect(&:chomp)
           }
         end
       end.compact
@@ -147,7 +147,7 @@ module Local
         end
         unless dns_lines.empty?
           {
-            interface: nmcli_intf[:interface], 
+            interface: nmcli_intf[:interface],
             type:      :ipv4,
             servers:   dns_lines.collect { |line| { address: line.split(":").last.strip } }
           }
@@ -164,13 +164,13 @@ module Local
           {
             interface: nmcli_intf[:interface],
             type:      :ipv4,
-            options:   Hash[ dhcp_lines.collect { |line| line.split(":").last.split("=").collect(&:strip) } ] 
+            options:   Hash[ dhcp_lines.collect { |line| line.split(":").last.split("=").collect(&:strip) } ]
           }
         end
       end.compact
     end
 
-    private 
+    private
 
     def hex_to_ip hex
       [hex].pack("H*").unpack("C*").reverse.join(".")

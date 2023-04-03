@@ -1,0 +1,136 @@
+
+* Gather information from local system
+
+JRuby for execution from browser and system compaibility
+
+** Network
+
+Hostname
+
+  Socket.gethostname
+
+IP addresses
+
+  Socket.getifaddrs.collect ...
+
+Interfaces
+
+  Socket.getifaddrs.collect ...
+
+Routes
+
+  linux: /proc/net/route
+
+ARP
+
+  linux: /proc/net/arp
+
+DHCP
+
+  linux: from nmcli
+
+DNS
+
+  linux: from nmcli
+
+** System
+
+
+* Example...
+
+
+gerard@wonko:~/dev/iqeo-local$ rvmc
+ruby-2.2.3@iqeo-local
+gerard@wonko:~/dev/iqeo-local$ bin/hostinfo
+{
+  "name": "wonko",
+  "interfaces": [
+    {
+      "name": "lo",
+      "mac": "00:00:00:00:00:00",
+      "up": true,
+      "flags": 65609
+    },
+    {
+      "name": "eth0",
+      "mac": "78:24:af:18:87:93",
+      "up": true,
+      "flags": 4099
+    },
+    {
+      "name": "wlan0",
+      "mac": "a0:a8:cd:12:09:7b",
+      "up": true,
+      "flags": 69699
+    }
+  ],
+  "addresses": [
+    {
+      "interface": "lo",
+      "flags": 65609,
+      "address": "127.0.0.1",
+      "netmask": "255.0.0.0",
+      "broadcast": null,
+      "type": "ipv4"
+    },
+    {
+      "interface": "wlan0",
+      "flags": 69699,
+      "address": "192.168.43.26",
+      "netmask": "255.255.255.0",
+      "broadcast": "192.168.43.255",
+      "type": "ipv4"
+    }
+  ],
+  "routes": [
+    {
+      "interface": "wlan0",
+      "type": "ipv4",
+      "destination": "0.0.0.0",
+      "netmask": "0.0.0.0",
+      "gateway": "192.168.43.1"
+    }
+  ],
+  "arp": [
+    {
+      "interface": "wlan0",
+      "type": "ipv4",
+      "address": "192.168.43.1",
+      "hwaddr": "64:bc:0c:43:38:b8"
+    }
+  ],
+  "dns": [
+    {
+      "interface": "wlan0",
+      "type": "ipv4",
+      "servers": [
+        {
+          "address": "192.168.43.1"
+        }
+      ]
+    }
+  ],
+  "dhcp": [
+    {
+      "interface": "wlan0",
+      "type": "ipv4",
+      "options": {
+        "host_name": "wonko",
+        "expiry": "1459175441",
+        "broadcast_address": "192.168.43.255",
+        "vendor_encapsulated_options": "ANDROID_METERED",
+        "dhcp_message_type": "5",
+        "routers": "192.168.43.1",
+        "dhcp_lease_time": "3600",
+        "ip_address": "192.168.43.26",
+        "subnet_mask": "255.255.255.0",
+        "dhcp_renewal_time": "1668",
+        "domain_name_servers": "192.168.43.1",
+        "dhcp_rebinding_time": "3018",
+        "network_number": "192.168.43.0",
+        "dhcp_server_identifier": "192.168.43.1"
+      }
+    }
+  ]
+}
+gerard@wonko:~/dev/iqeo-local$
